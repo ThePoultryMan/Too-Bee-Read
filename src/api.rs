@@ -5,7 +5,7 @@ pub async fn search_for_book(name: &str) -> Result<(), Error> {
         .await?
         .text()
         .await?;
-    
+
     println!("{}", body);
 
     Ok(())
