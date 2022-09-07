@@ -1,8 +1,9 @@
+use super::{book_search::BookSearch, PopUp};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct App {
-    username: String,
+    book_search_window: BookSearch,
 }
 
 impl App {
@@ -18,23 +19,32 @@ impl App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            username: "Username".to_owned(),
+            book_search_window: BookSearch::default(),
         }
     }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self { username } = self;
+        let Self { book_search_window } = self;
+
+        let mut book_window = BookSearch::default();
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
-                ui.menu_button("Home", |ui| {
-                    if ui.button("Quit").clicked() {
-                        frame.close();
+                ui.menu_button("Add", |ui| {
+                    if ui.button("By name...").clicked() {
+                        self.book_search_window.show(ctx, &mut true);
                     }
                 })
             });
         });
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            if self.book_search_window.is_visible() {
+                book_window.show(ctx, &mut true);
+            }
+        });
+
     }
 }
