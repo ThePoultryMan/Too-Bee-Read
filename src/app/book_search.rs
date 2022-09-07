@@ -34,13 +34,34 @@ impl BookSearch {
 
     fn render_book_result(&self, ui: &mut egui::Ui, volume: api::VolumeInfo) {
         ui.add_space(PADDING);
-        let title_text = egui::RichText::new(volume.get_title()).color(Color32::WHITE).size(19.0);
-        ui.label(title_text);
+        ui.horizontal(|ui| {
+            let title_text = egui::RichText::new(volume.get_title())
+            .color(Color32::WHITE)
+            .size(19.0);
+            ui.label(title_text);
+            ui.add_space(PADDING * 2.0);
+            if ui.button("Add to TBR").clicked() {
+                todo!();
+            };
+        });
         ui.add_space(PADDING);
         ui.colored_label(Color32::WHITE, "Authors:");
-        for author in volume.get_authors() {
-            ui.label(author);
-        }
+        ui.horizontal(|ui| {
+            for author in volume.get_authors() {
+                if volume
+                    .get_authors()
+                    .iter()
+                    .position(|a| a == &author)
+                    .unwrap_or(0 as usize)
+                    + 1
+                    != volume.get_authors().len()
+                {
+                    ui.label(author + ",");
+                } else {
+                    ui.label(author);
+                }
+            }
+        });
         ui.separator();
     }
 }
