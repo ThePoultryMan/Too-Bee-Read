@@ -28,23 +28,20 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         let Self { book_search_window } = self;
 
-        let mut book_window = BookSearch::default();
-
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
                 ui.menu_button("Add", |ui| {
                     if ui.button("By name...").clicked() {
-                        self.book_search_window.show(ctx, &mut true);
+                        book_search_window.enable(true);
                     }
                 })
             });
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            if self.book_search_window.is_visible() {
-                book_window.show(ctx, &mut true);
-            }
-        });
+        egui::CentralPanel::default().show(ctx, |_ui| {});
 
+        if book_search_window.is_visible() {
+            book_search_window.show(ctx);
+        }
     }
 }

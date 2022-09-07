@@ -4,7 +4,7 @@ use super::PopUp;
 
 #[derive(Deserialize, Serialize)]
 pub struct BookSearch {
-    enabled: bool,
+    pub enabled: bool,
     search_text: String,
 }
 
@@ -18,14 +18,26 @@ impl Default for BookSearch {
 }
 
 impl PopUp for BookSearch {
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(&mut self, ctx: &egui::Context) {
+        let Self {
+            enabled: _,
+            search_text,
+        } = self;
+
         egui::Window::new("Add book to your Too Bee Read List")
-            .open(open)
             .resizable(true)
             .show(ctx, |ui| {
-                ui.add(egui::TextEdit::singleline(&mut self.search_text).hint_text("Enter a book title..."));
+                self.create_ui(ui);
             });
         self.enabled = true;
+    }
+
+    fn create_ui(&mut self, ui: &mut egui::Ui) {
+        let search_input = ui.text_edit_singleline(&mut self.search_text);
+    }
+
+    fn enable(&mut self, enable: bool) {
+        self.enabled = enable;
     }
 
     fn is_visible(&self) -> bool {
