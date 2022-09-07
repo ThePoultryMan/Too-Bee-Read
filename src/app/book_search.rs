@@ -1,4 +1,7 @@
+use pollster::FutureExt;
 use serde::{Deserialize, Serialize};
+
+use crate::api;
 
 use super::PopUp;
 
@@ -21,7 +24,7 @@ impl PopUp for BookSearch {
     fn show(&mut self, ctx: &egui::Context) {
         let Self {
             enabled: _,
-            search_text,
+            search_text: _,
         } = self;
 
         egui::Window::new("Add book to your Too Bee Read List")
@@ -33,7 +36,11 @@ impl PopUp for BookSearch {
     }
 
     fn create_ui(&mut self, ui: &mut egui::Ui) {
-        let search_input = ui.text_edit_singleline(&mut self.search_text);
+        let _search_input = ui.text_edit_singleline(&mut self.search_text);
+
+        if ui.input_mut().consume_key(egui::Modifiers::NONE, egui::Key::Enter) {
+            api::search_for_book(&self.search_text).block_on().unwrap();
+        }
     }
 
     fn enable(&mut self, enable: bool) {

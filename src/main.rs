@@ -3,7 +3,8 @@ mod app;
 
 use app::window;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
         "Too Bee Read",
