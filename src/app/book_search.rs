@@ -5,6 +5,8 @@ use crate::api;
 
 use super::PopUp;
 
+const PADDING: f32 = 5.0;
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct BookSearch {
     enabled: bool,
@@ -27,6 +29,16 @@ impl BookSearch {
 
     pub fn has_result(&self) -> bool {
         self.result.is_some()
+    }
+
+    fn render_book_result(&self, ui: &mut egui::Ui, volume: api::VolumeInfo) {
+        ui.add_space(PADDING);
+        ui.label(volume.get_title());
+        ui.add_space(PADDING);
+        ui.label("Authors:");
+        for author in volume.get_authors() {
+            ui.label(author);
+        }
     }
 }
 
@@ -69,7 +81,7 @@ impl PopUp for BookSearch {
         egui::containers::ScrollArea::vertical().show(ui, |ui| {
             if self.is_visible() && self.has_result() {
                 for book_result in self.get_result().get_items() {
-                    ui.label(book_result.get_volume_info().get_title());
+                    self.render_book_result(ui, book_result.get_volume_info());
                 }
             }
         });

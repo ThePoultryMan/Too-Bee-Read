@@ -107,6 +107,10 @@ impl VolumeInfo {
     pub fn get_title(&self) -> String {
         self.title.clone()
     }
+
+    pub fn get_authors(&self) -> Vec<String> {
+        self.authors.clone()
+    }
 }
 
 impl ReadingModes {
