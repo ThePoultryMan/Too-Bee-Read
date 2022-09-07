@@ -131,8 +131,8 @@ impl Default for ImageLinks {
     }
 }
 
-pub async fn search_for_book(name: &str) -> Result<Volume, Error> {
-    let body = reqwest::get("https://www.googleapis.com/books/v1/volumes?q=".to_owned() + name)
+pub async fn search_for_book(title: &str) -> Result<Volume, Error> {
+    let body = reqwest::get("https://www.googleapis.com/books/v1/volumes?q=".to_owned() + &title.to_lowercase().replace(" ", "+"))
         .await?
         .text()
         .await?;
@@ -141,8 +141,6 @@ pub async fn search_for_book(name: &str) -> Result<Volume, Error> {
         Ok(volume) => volume,
         Err(err) => Volume::read_error(err),
     };
-
-    println!("{}", response.items[0].volumeInfo.title);
 
     Ok(response)
 }
