@@ -4,7 +4,7 @@ use reqwest::Error;
 use serde::{Deserialize, Serialize};
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Volume {
     kind: String,
     totalItems: i32,
@@ -12,8 +12,8 @@ pub struct Volume {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
-struct Item {
+#[derive(Deserialize, Serialize, Clone)]
+pub struct Item {
     kind: String,
     id: String,
     etag: String,
@@ -21,8 +21,8 @@ struct Item {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
-struct VolumeInfo {
+#[derive(Deserialize, Serialize, Clone)]
+pub struct VolumeInfo {
     title: String,
     authors: Vec<String>,
     publisher: Option<String>,
@@ -41,14 +41,14 @@ struct VolumeInfo {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 struct ReadingModes {
     text: bool,
     image: bool,
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 struct ImageLinks {
     smallThumbnail: String,
     thumbnail: String,
@@ -62,6 +62,10 @@ impl Volume {
             items: vec![Item::read_error(error)],
         }
     }
+
+    pub fn get_items(&self) -> Vec<Item> {
+        self.items.clone()
+    }
 }
 
 impl Item {
@@ -72,6 +76,10 @@ impl Item {
             etag: "thisstillisntabook".to_owned(),
             volumeInfo: VolumeInfo::read_error(error),
         }
+    }
+
+    pub fn get_volume_info(&self) -> VolumeInfo {
+        self.volumeInfo.clone()
     }
 }
 
@@ -95,6 +103,10 @@ impl VolumeInfo {
             infoLink: "https://github.com/ThePoultryMan/Too-Bee-Read".to_owned(),
         }
     }
+
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
 }
 
 impl ReadingModes {
@@ -115,7 +127,7 @@ impl Default for ImageLinks {
     }
 }
 
-pub async fn search_for_book(name: &str) -> Result<(), Error> {
+pub async fn search_for_book(name: &str) -> Result<Volume, Error> {
     let body = reqwest::get("https://www.googleapis.com/books/v1/volumes?q=".to_owned() + name)
         .await?
         .text()
@@ -128,5 +140,5 @@ pub async fn search_for_book(name: &str) -> Result<(), Error> {
 
     println!("{}", response.items[0].volumeInfo.title);
 
-    Ok(())
+    Ok(response)
 }

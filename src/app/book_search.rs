@@ -5,10 +5,29 @@ use crate::api;
 
 use super::PopUp;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct BookSearch {
-    pub enabled: bool,
+    enabled: bool,
     search_text: String,
+    result: Option<api::Volume>,
+}
+
+impl BookSearch {
+    fn set_result(&mut self, result: api::Volume) {
+        self.result = Some(result);
+    }
+
+    fn _clear_result(&mut self) {
+        self.result = None;
+    }
+
+    pub fn get_result(&mut self) -> api::Volume {
+        self.result.clone().unwrap()
+    }
+
+    pub fn has_result(&self) -> bool {
+        self.result.is_some()
+    }
 }
 
 impl Default for BookSearch {
@@ -16,6 +35,7 @@ impl Default for BookSearch {
         Self {
             enabled: false,
             search_text: "".to_owned(),
+            result: None,
         }
     }
 }
@@ -25,6 +45,7 @@ impl PopUp for BookSearch {
         let Self {
             enabled: _,
             search_text: _,
+            result: _,
         } = self;
 
         egui::Window::new("Add book to your Too Bee Read List")
@@ -42,8 +63,16 @@ impl PopUp for BookSearch {
             .input_mut()
             .consume_key(egui::Modifiers::NONE, egui::Key::Enter)
         {
-            api::search_for_book(&self.search_text).block_on().unwrap();
+            self.set_result(api::search_for_book(&self.search_text).block_on().unwrap());
         }
+
+        egui::containers::ScrollArea::vertical().show(ui, |ui| {
+            if self.is_visible() && self.has_result() {
+                for book_result in self.get_result().get_items() {
+                    ui.label(book_result.get_volume_info().get_title());
+                }
+            }
+        });
     }
 
     fn enable(&mut self, enable: bool) {
