@@ -1,3 +1,4 @@
+use egui::Color32;
 use pollster::FutureExt;
 use serde::{Deserialize, Serialize};
 
@@ -33,12 +34,14 @@ impl BookSearch {
 
     fn render_book_result(&self, ui: &mut egui::Ui, volume: api::VolumeInfo) {
         ui.add_space(PADDING);
-        ui.label(volume.get_title());
+        let title_text = egui::RichText::new(volume.get_title()).color(Color32::WHITE).size(19.0);
+        ui.label(title_text);
         ui.add_space(PADDING);
-        ui.label("Authors:");
+        ui.colored_label(Color32::WHITE, "Authors:");
         for author in volume.get_authors() {
             ui.label(author);
         }
+        ui.separator();
     }
 }
 
@@ -78,6 +81,7 @@ impl PopUp for BookSearch {
             self.set_result(api::search_for_book(&self.search_text).block_on().unwrap());
         }
 
+        ui.add_space(PADDING);
         egui::containers::ScrollArea::vertical().show(ui, |ui| {
             if self.is_visible() && self.has_result() {
                 for book_result in self.get_result().get_items() {
