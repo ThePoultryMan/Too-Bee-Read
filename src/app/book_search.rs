@@ -2,7 +2,10 @@ use egui::Color32;
 use pollster::FutureExt;
 use serde::{Deserialize, Serialize};
 
-use crate::api;
+use crate::{
+    api, save,
+    save::{BookData, BookStatus},
+};
 
 use super::PopUp;
 
@@ -32,7 +35,7 @@ impl BookSearch {
         self.result.is_some()
     }
 
-    fn render_book_result(&self, ui: &mut egui::Ui, volume: api::VolumeInfo) {
+    fn render_book_result(&self, ui: &mut egui::Ui, volume: &api::VolumeInfo) {
         ui.add_space(PADDING);
         ui.horizontal(|ui| {
             let title_text = egui::RichText::new(volume.get_title())
@@ -41,7 +44,13 @@ impl BookSearch {
             ui.label(title_text);
             ui.add_space(PADDING * 2.0);
             if ui.button("Add to TBR").clicked() {
-                todo!();
+                let mut save_data = save::get_save();
+                save_data.add_book_data(BookData::new(
+                    BookStatus::Unread,
+                    volume.get_title(),
+                    volume.to_owned(),
+                ));
+                save_data.write_save();
             };
         });
         ui.add_space(PADDING);
@@ -106,7 +115,7 @@ impl PopUp for BookSearch {
         egui::containers::ScrollArea::vertical().show(ui, |ui| {
             if self.is_visible() && self.has_result() {
                 for book_result in self.get_result().get_items() {
-                    self.render_book_result(ui, book_result.get_volume_info());
+                    self.render_book_result(ui, &book_result.get_volume_info());
                 }
             }
         });

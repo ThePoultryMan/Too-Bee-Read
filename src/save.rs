@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::fs::{create_dir, File};
+use std::fs::{create_dir, read_to_string, File};
 use std::path::Path;
 
 use crate::api;
@@ -9,15 +9,15 @@ pub struct SaveData {
     books: Option<Vec<BookData>>,
 }
 
-#[derive(Deserialize, Serialize)]
-struct BookData {
+#[derive(Deserialize, Serialize, Clone)]
+pub struct BookData {
     status: BookStatus,
     title: String,
     volume_info: api::VolumeInfo,
 }
 
-#[derive(Deserialize, Serialize)]
-enum BookStatus {
+#[derive(Deserialize, Serialize, Clone)]
+pub enum BookStatus {
     Unread,
     InProgress,
     Read,
@@ -33,10 +33,32 @@ impl SaveData {
 
         serde_json::to_writer(save_data, self).expect("Couldn't write save data to file.");
     }
+
+    pub fn add_book_data(&mut self, book_data: BookData) {
+        let mut new_book_data = self.books.clone().unwrap_or(Vec::new());
+        new_book_data.push(book_data);
+        self.books = Some(new_book_data);
+    }
+}
+
+impl BookData {
+    pub fn new(status: BookStatus, title: String, volume_info: api::VolumeInfo) -> Self {
+        Self {
+            status,
+            title,
+            volume_info,
+        }
+    }
 }
 
 impl Default for SaveData {
     fn default() -> Self {
         Self { books: None }
     }
+}
+
+pub fn get_save() -> SaveData {
+    let save_data = read_to_string("./data/save_data.json").expect("Couldn't retrieve save data.");
+
+    serde_json::from_str::<SaveData>(&save_data).expect("Couldn't use save data.")
 }
