@@ -36,8 +36,8 @@ impl BookSearch {
         ui.add_space(PADDING);
         ui.horizontal(|ui| {
             let title_text = egui::RichText::new(volume.get_title())
-            .color(Color32::WHITE)
-            .size(19.0);
+                .color(Color32::WHITE)
+                .size(19.0);
             ui.label(title_text);
             ui.add_space(PADDING * 2.0);
             if ui.button("Add to TBR").clicked() {
