@@ -1,20 +1,44 @@
-use egui::{Color32, FontId};
+use egui::{NumExt, TextStyle};
 
-pub fn new(ui: &mut egui::Ui, title: &str) -> egui::Response {
-    let text_width = ui.painter().layout_no_wrap(title.to_owned(), FontId::default(), Color32::WHITE).rect.size().x;
-    let desired_size = ui.spacing().interact_size.y * egui::vec2(text_width / 2.0, 7.0);
+use crate::api;
 
-    let (rect, mut response) = ui.allocate_exact_size(desired_size, egui::Sense::click());
+pub struct BookWidget {
+    title: egui::WidgetText,
+}
 
-    
-        ui.painter().text(
-            rect.left_top(),
-            egui::Align2::LEFT_TOP,
-            title,
-            FontId::default(),
-            Color32::WHITE,
-        );
-    
+impl BookWidget {
+    pub fn new(volume: api::VolumeInfo) -> Self {
+        BookWidget {
+            title: volume.get_title().into(),
+        }
+    }
+}
 
-    response
+impl egui::Widget for BookWidget {
+    fn ui(self, ui: &mut egui::Ui) -> egui::Response {
+        let BookWidget { title } = self;
+
+        let spacing = ui.spacing();
+        let (title, mut desired_size) = {
+            let wrap_width = ui.available_width();
+            let title = title.into_galley(ui, None, wrap_width, TextStyle::Body);
+
+            let desired_size = title.size();
+
+            (Some(title), desired_size)
+        };
+
+        desired_size = desired_size.at_least(egui::Vec2::splat(spacing.interact_size.y));
+        let (rect, response) = ui.allocate_exact_size(desired_size, egui::Sense::click());
+
+        if ui.is_rect_visible(rect) {
+            let visuals = ui.style().interact(&response);
+            if let Some(title) = title {
+                let text_pos = egui::pos2(rect.min.x, rect.center().y - 0.5 * title.size().y);
+                title.paint_with_visuals(ui.painter(), text_pos, visuals);
+            }
+        }
+
+        response
+    }
 }

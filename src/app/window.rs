@@ -50,7 +50,7 @@ impl eframe::App for App {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.horizontal_wrapped(|ui| {
                         for book_data in save_data.get_books() {
-                            widgets::book_widget::new(ui, &book_data.get_title());
+                            ui.add(widgets::BookWidget::new(book_data.get_volume_info()));
                         }
                     });
                 });

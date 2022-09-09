@@ -1,1 +1,3 @@
-pub mod book_widget;
+pub use book_widget::BookWidget;
+
+mod book_widget;
