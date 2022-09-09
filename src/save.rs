@@ -58,10 +58,6 @@ impl BookData {
         }
     }
 
-    pub fn get_title(&self) -> String {
-        self.title.clone()
-    }
-
     pub fn get_volume_info(&self) -> api::VolumeInfo {
         self.volume_info.clone()
     }
