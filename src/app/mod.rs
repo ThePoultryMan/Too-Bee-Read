@@ -1,4 +1,5 @@
 pub mod book_search;
+pub mod widgets;
 pub mod window;
 
 pub trait PopUp {

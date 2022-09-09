@@ -39,6 +39,14 @@ impl SaveData {
         new_book_data.push(book_data);
         self.books = Some(new_book_data);
     }
+
+    pub fn has_books(&self) -> bool {
+        self.books.is_some()
+    }
+
+    pub fn get_books(&self) -> Vec<BookData> {
+        self.books.clone().expect("A severe error has occured.")
+    }
 }
 
 impl BookData {
@@ -48,6 +56,14 @@ impl BookData {
             title,
             volume_info,
         }
+    }
+
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
+
+    pub fn get_volume_info(&self) -> api::VolumeInfo {
+        self.volume_info.clone()
     }
 }
 
