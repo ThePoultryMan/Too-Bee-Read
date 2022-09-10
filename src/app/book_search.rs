@@ -16,6 +16,7 @@ pub struct BookSearch {
     enabled: bool,
     search_text: String,
     result: Option<api::Volume>,
+    pub save_changed: bool,
 }
 
 impl BookSearch {
@@ -35,7 +36,7 @@ impl BookSearch {
         self.result.is_some()
     }
 
-    fn render_book_result(&self, ui: &mut egui::Ui, volume: &api::VolumeInfo) {
+    fn render_book_result(&mut self, ui: &mut egui::Ui, volume: &api::VolumeInfo) {
         ui.add_space(PADDING);
         ui.horizontal(|ui| {
             let title_text = egui::RichText::new(volume.get_title())
@@ -51,6 +52,7 @@ impl BookSearch {
                     volume.to_owned(),
                 ));
                 save_data.write_save();
+                self.save_changed = true;
             };
         });
         ui.add_space(PADDING);
@@ -71,7 +73,7 @@ impl BookSearch {
                 }
             }
         });
-        ui.separator();
+        
     }
 }
 
@@ -81,6 +83,7 @@ impl Default for BookSearch {
             enabled: false,
             search_text: "".to_owned(),
             result: None,
+            save_changed: false,
         }
     }
 }
@@ -91,6 +94,7 @@ impl PopUp for BookSearch {
             enabled: _,
             search_text: _,
             result: _,
+            save_changed: _,
         } = self;
 
         egui::Window::new("Add book to your Too Bee Read List")
@@ -101,7 +105,7 @@ impl PopUp for BookSearch {
         self.enabled = true;
     }
 
-    fn create_ui(&mut self, ui: &mut egui::Ui) {
+    fn create_ui(&mut self, ui: &mut egui::Ui,) {
         let _search_input = ui.text_edit_singleline(&mut self.search_text);
 
         if ui

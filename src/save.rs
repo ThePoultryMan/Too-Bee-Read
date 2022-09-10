@@ -4,7 +4,7 @@ use std::path::Path;
 
 use crate::api;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct SaveData {
     books: Option<Vec<BookData>>,
 }

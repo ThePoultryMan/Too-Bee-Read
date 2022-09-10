@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::{book_search::BookSearch, widgets, PopUp};
 use crate::save;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct App {
     book_search_window: BookSearch,
     save_data: save::SaveData,
@@ -30,10 +30,15 @@ impl Default for App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let mut dummy_self = self;
+        if dummy_self.book_search_window.save_changed {
+            dummy_self.save_data = save::get_save();
+            dummy_self.book_search_window.save_changed = false;
+        }
         let Self {
             book_search_window,
             save_data,
-        } = self;
+        } = dummy_self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
