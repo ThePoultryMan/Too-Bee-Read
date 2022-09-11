@@ -53,6 +53,7 @@ impl eframe::App for App {
         egui::CentralPanel::default().show(ctx, |ui| {
             if save_data.has_books() {
                 egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.spacing_mut().item_spacing.y = 8.0; // Makes the x and y spacing equal.
                     ui.horizontal_wrapped(|ui| {
                         for book_data in save_data.get_books() {
                             ui.add(widgets::BookWidget::new(book_data.get_volume_info()));

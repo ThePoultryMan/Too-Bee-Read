@@ -73,7 +73,6 @@ impl BookSearch {
                 }
             }
         });
-        
     }
 }
 
@@ -105,7 +104,7 @@ impl PopUp for BookSearch {
         self.enabled = true;
     }
 
-    fn create_ui(&mut self, ui: &mut egui::Ui,) {
+    fn create_ui(&mut self, ui: &mut egui::Ui) {
         let _search_input = ui.text_edit_singleline(&mut self.search_text);
 
         if ui
